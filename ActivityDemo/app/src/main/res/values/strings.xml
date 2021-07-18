@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ActivityDemo</string>
+    <string name="tip1">输入用户名</string>
+    <string name="tip2">输入密码</string>
+    <string name="tip3">账号不能为空</string>
+    <string name="tip4">密码不能为空</string>
+    <string name="tip5">账号或密码错误</string>
+    <string name="btn1">提交</string>
+    <string name="btn2">提交-隐式</string>
+</resources>
