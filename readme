@@ -7,3 +7,10 @@ gradle 2.1 及以上最新版本的语法
 指定插件就需要使用“apply plugin”了。
 https://plugins.gradle.org/
  2.0及older 版本的语法
+
+
+plugins 和 apply plugin 的效果基本是一样的。
+
+plugins 是后来添加的特性。
+plugins 中指定的插件必须是 https://plugins.gradle.org/ 存在的。
+apply plugin 可以用在 allprojects 和 subprojects 中。
