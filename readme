@@ -2,6 +2,8 @@ http://5sing.kugou.com/index.html
 
 
 “plugins {}”块导入的是Gradle官方插件仓库里的插件。
+gradle 2.1 及以上最新版本的语法
 如果使用“buildscript {}”块指定第三方库作为Gradle插件的话，
 指定插件就需要使用“apply plugin”了。
 https://plugins.gradle.org/
+ 2.0及older 版本的语法
