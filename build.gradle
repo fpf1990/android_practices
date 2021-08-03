@@ -1,0 +1,170 @@
+plugins {
+    id 'groovy'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.codehaus.groovy:groovy-all:3.0.5'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    compile 'ch.qos.logback:logback:0.5'
+    runtime 'ch.qos.logback:logback:0.5'
+}
+
+//解决依赖冲突
+//修改默认解决策略（gradle的默认策略是自动选择最高版本的依赖）
+configurations.all {
+    resolveStrategy{
+        //failOnVersionConflict()//失败报错，用于发现冲突
+        force 'ch.qos.logback:logback:1.5'
+    }
+}
+
+//1.查看依赖报告(运行右侧gradle的默认dependencis任务)
+
+//2.排除传递性依赖
+compile('ch.qos.logback:logback:0.5'){
+    exclude group:'ch.qos',module:'app1'
+    //transitive=false//排除所有传递性依赖，不可取
+}
+
+//3.强制指定一个版本
+
+
+test {
+    useJUnitPlatform()
+}
+
+this.getRootPro()
+
+
+//获取所有项目
+def getProjects(){
+    this.getAllprojects().eachWithIndex{ Project project, int index ->
+        if(index==0){
+            println "root project:'{$project.name}'"
+        }
+        else{
+            println "+--- project:{$project.name}"
+        }
+    }
+}
+
+//获取所有子项目
+def getSubProjects(){
+    this.getSubprojects().eachWithIndex{ Project project, int index ->
+        println "+--- project:{$project.name}"
+    }
+}
+
+//获取父项目
+def getParentProject(){
+    String name = this.getParent().name
+    println name
+}
+
+//获取根项目
+def getRootPro(){
+    String name = this.getRootProject();
+    println name
+}
+
+//配置子项目app
+project('app1'){
+    //里面可以写你在子项目的build.gradle中写的任何配置
+    println "1"
+}
+
+//配置当前项目及其所有子app
+allprojects {
+    //里面可以写你在项目的build.gradle中写的任何配置
+    println "2"
+}
+
+//配置当前所有子项目
+subprojects {
+    //里面可以写你在子项目的build.gradle中写的任何配置
+    println "3"
+}
+
+//扩展属性的两种方式
+//1.ext{}
+//2.在gradle.properties文件中定义eg：loadAppModule=false  在settings.gradle中include app就可以加这个条件来判断是否引入app子项目
+
+
+println this.getRootDir().absolutePath
+println this.getBuildDir().absolutePath
+println this.getProjectDir().absolutePath
+
+println this.getContent('settings.gradle');
+
+def getContent(String path){
+    try{
+        //还有一个files 参数是多个，可定位多个文件
+        //文件定位
+        def file=file(path)
+        return file.text
+    }catch(GradleException e){
+        println 'file not found'
+    }
+    return null
+}
+
+//文件拷贝
+copy{
+    from file( 'app1/build.gradle')
+    into getRootProject().getBuildDir()
+    exclude{}
+    rename{}
+}
+
+this.fileTree('src')
+//文件树的遍历
+fileTree(){FileTree fileTree->
+    fileTree.visit {FileTreeElement element->
+        println element.file.name
+        copy{
+            from element.file
+            into getRootProject().getBuildDir()
+            exclude{}
+            rename{}
+        }
+    }
+}
+
+//修改文件加载目录，不修改，默认从java下加载源代码，resources下加载资源
+sourceSets {
+    main{
+        resources.srcDirs=['lib','libc']//修改资源文件的存放位置，将lib和libc中就可以存放资源了
+    }
+}
+
+buildscript {ScriptHandler scriptHandler->
+    //配置工程的仓库地址
+    scriptHandler.repositories {RepositoryHandler repositoryHandler
+        repositoryHandler.jcenter()
+        repositoryHandler.mavenCentral()
+        repositoryHandler.mavenLocal()
+        repositoryHandler.ivy {}
+        repositoryHandler.maven {
+            name 'personal'
+            url 'http://www.baidu.com'
+            credentials{
+                username='admin'
+                password='admin'
+            }
+        }
+    }
+    //配置工程的插件的依赖地址
+    scriptHandler.dependencies {DependencyHandler dependencyHandler->
+        classpath 'com.android.toolsbuild:gradle:2.0.2'
+    }
+}
+
+//search.maven.org
